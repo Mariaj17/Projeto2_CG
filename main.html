@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Take them</title>
+    <style>
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <script type="module">
+        import * as THREE from './libs/three.module.js'
+        import { OrbitControls } from './libs/OrbitControls.js'
+
+        let down = false    /* variavel do movimento caranguejo 1 */
+        let down2 = true    /* variavel do movimento caranguejo 2 */
+        let create = false  /* variavel para criar o peixe */
+        let select = false  /* variavel que o carangueijo esta selecionado */
+        let leave = false   /* variavel que largou o caranguejo */
+
+        const objects = []
+
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color('#0B5394')
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(10, 100, 30);
+
+
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        const mouse = new THREE.Vector2(), raycaster = new THREE.Raycaster();
+
+
+        // const controls = new OrbitControls( camera, renderer.domElement );
+        // controls.update();
+
+        const axesHelper = new THREE.AxesHelper(5)
+        scene.add(axesHelper)
+
+
+
+
+        const ambientLight = new THREE.AmbientLight('#BDBDBD')
+        scene.add(ambientLight)
+
+
+
+        /* Construção do plano */
+        const planeGeometry = new THREE.PlaneGeometry(10000, 10000);
+        const planeMaterial = new THREE.MeshStandardMaterial({ color: '#f6d7b0', side: THREE.DoubleSide });
+        const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+        scene.add(plane);
+        plane.rotation.x = -0.5 * Math.PI;
+
+        const gridHelper = new THREE.GridHelper(1000, 100);
+        scene.add(gridHelper)
+
+        /* Construção do primeiro caranguejo */
+
+        const circleGeometry = new THREE.SphereGeometry(10, 50, 50);
+        const CarMaterial = new THREE.MeshStandardMaterial({ color: '#e61919' });     /* , wireframe:true  */
+        const CarBody1 = new THREE.Mesh(circleGeometry, CarMaterial);
+        scene.add(CarBody1);
+        CarBody1.position.y = 10
+        CarBody1.position.x = 0/* -100 */
+        CarBody1.position.z = 0 /* -100 */
+
+        camera.lookAt(CarBody1.position)
+
+        const eyeGeometry = new THREE.SphereGeometry(1, 15, 15);
+        const eyeMaterial = new THREE.MeshStandardMaterial({ color: '#000000', wireframe: true });     /* , wireframe:true  */
+        const eye1 = new THREE.Mesh(eyeGeometry, eyeMaterial);
+        CarBody1.add(eye1);
+        eye1.position.y = 6
+        eye1.position.x = 4
+        eye1.position.z = 7
+
+        const eye2 = new THREE.Mesh(eyeGeometry, eyeMaterial);
+        CarBody1.add(eye2);
+        eye2.position.y = 6
+        eye2.position.x = -4
+        eye2.position.z = 7
+
+
+        const legGeometry = new THREE.BoxGeometry(15, 2, 2)
+        const Car1leg1 = new THREE.Mesh(legGeometry, CarMaterial)
+        CarBody1.add(Car1leg1)
+        Car1leg1.position.x = 16
+        Car1leg1.position.y = 5
+        Car1leg1.rotation.z = 0.2;
+        Car1leg1.rotation.x = 0.4;
+
+
+        const pincaGeometry = new THREE.CylinderGeometry(1, 0, 19)
+        const Car1pinca1 = new THREE.Mesh(pincaGeometry, CarMaterial)
+        Car1leg1.add(Car1pinca1)
+        Car1pinca1.position.x = 9.5
+        Car1pinca1.position.y = -9
+        Car1pinca1.rotation.z = 0.1 * Math.PI;
+
+
+        const Car1leg2 = new THREE.Mesh(legGeometry, CarMaterial)
+        CarBody1.add(Car1leg2)
+        Car1leg2.position.x = 13
+        Car1leg2.position.y = 5
+        Car1leg2.position.z = -6
+        Car1leg2.rotation.z = 0.2;
+        Car1leg2.rotation.x = 0.4;
+
+        const Car1pinca2 = new THREE.Mesh(pincaGeometry, CarMaterial)
+        Car1leg2.add(Car1pinca2)
+        Car1pinca2.position.x = 9.5
+        Car1pinca2.position.y = -9
+        Car1pinca2.rotation.z = 0.1 * Math.PI;
+
+        const Car1leg3 = new THREE.Mesh(legGeometry, CarMaterial)
+        CarBody1.add(Car1leg3)
+        Car1leg3.position.x = 13
+        Car1leg3.position.y = 5
+        Car1leg3.position.z = 6
+        Car1leg3.rotation.z = 0.2;
+        Car1leg3.rotation.x = 0.4;
+
+        const Car1pinca3 = new THREE.Mesh(pincaGeometry, CarMaterial)
+        Car1leg3.add(Car1pinca3)
+        Car1pinca3.position.x = 9.5
+        Car1pinca3.position.y = -9
+        Car1pinca3.rotation.z = 0.1 * Math.PI;
+
+
+        const Car1leg4 = new THREE.Mesh(legGeometry, CarMaterial)
+        CarBody1.add(Car1leg4)
+        Car1leg4.position.x = -16
+        Car1leg4.position.y = 5
+        Car1leg4.rotation.z = -0.2;
+        Car1leg4.rotation.x = 0.4;
+
+        const Car1pinca4 = new THREE.Mesh(pincaGeometry, CarMaterial)
+        Car1leg4.add(Car1pinca4)
+        Car1pinca4.position.x = -9.5
+        Car1pinca4.position.y = -9
+        Car1pinca4.rotation.z = -0.1 * Math.PI;
+
+
+        const Car1leg5 = new THREE.Mesh(legGeometry, CarMaterial)
+        CarBody1.add(Car1leg5)
+        Car1leg5.position.x = -13
+        Car1leg5.position.y = 5
+        Car1leg5.position.z = -6
+        Car1leg5.rotation.z = -0.2;
+        Car1leg5.rotation.x = 0.4;
+
+        const Car1pinca5 = new THREE.Mesh(pincaGeometry, CarMaterial)
+        Car1leg5.add(Car1pinca5)
+        Car1pinca5.position.x = -9.5
+        Car1pinca5.position.y = -9
+        Car1pinca5.rotation.z = -0.1 * Math.PI;
+
+        const Car1leg6 = new THREE.Mesh(legGeometry, CarMaterial)
+        CarBody1.add(Car1leg6)
+        Car1leg6.position.x = -13
+        Car1leg6.position.y = 5
+        Car1leg6.position.z = 6
+        Car1leg6.rotation.z = -0.2;
+        Car1leg6.rotation.x = 0.4;
+
+        const Car1pinca6 = new THREE.Mesh(pincaGeometry, CarMaterial)
+        Car1leg6.add(Car1pinca6)
+        Car1pinca6.position.x = -9.5
+        Car1pinca6.position.y = -9
+        Car1pinca6.rotation.z = -0.1 * Math.PI;
+
+
+        /* Construção do segundo caranguejo */
+
+        const CarBody2 = new THREE.Mesh(circleGeometry, CarMaterial);
+        scene.add(CarBody2);
+        CarBody2.position.y = 10
+        CarBody2.position.x = 100
+        CarBody2.position.z = 100
+        CarBody2.rotation.y = -1.5
+
+        const Car2eye1 = new THREE.Mesh(eyeGeometry, eyeMaterial);
+        CarBody2.add(Car2eye1);
+        Car2eye1.position.y = 6
+        Car2eye1.position.x = 4
+        Car2eye1.position.z = 7
+
+        const Car2eye2 = new THREE.Mesh(eyeGeometry, eyeMaterial);
+        CarBody2.add(Car2eye2);
+        Car2eye2.position.y = 6
+        Car2eye2.position.x = -4
+        Car2eye2.position.z = 7
+
+
+        const Car2leg1 = new THREE.Mesh(legGeometry, CarMaterial)
+        CarBody2.add(Car2leg1)
+        Car2leg1.position.x = 16
+        Car2leg1.position.y = 5
+        Car2leg1.rotation.z = 0.2;
+        Car2leg1.rotation.x = 0.4;
+
+
+        const Car2pinca1 = new THREE.Mesh(pincaGeometry, CarMaterial)
+        Car2leg1.add(Car2pinca1)
+        Car2pinca1.position.x = 9.5
+        Car2pinca1.position.y = -9
+        Car2pinca1.rotation.z = 0.1 * Math.PI;
+
+
+        const Car2leg2 = new THREE.Mesh(legGeometry, CarMaterial)
+        CarBody2.add(Car2leg2)
+        Car2leg2.position.x = 13
+        Car2leg2.position.y = 5
+        Car2leg2.position.z = -6
+        Car2leg2.rotation.z = 0.2;
+        Car2leg2.rotation.x = 0.4;
+
+        const Car2pinca2 = new THREE.Mesh(pincaGeometry, CarMaterial)
+        Car2leg2.add(Car2pinca2)
+        Car2pinca2.position.x = 9.5
+        Car2pinca2.position.y = -9
+        Car2pinca2.rotation.z = 0.1 * Math.PI;
+
+        const Car2leg3 = new THREE.Mesh(legGeometry, CarMaterial)
+        CarBody2.add(Car2leg3)
+        Car2leg3.position.x = 13
+        Car2leg3.position.y = 5
+        Car2leg3.position.z = 6
+        Car2leg3.rotation.z = 0.2;
+        Car2leg3.rotation.x = 0.4;
+
+        const Car2pinca3 = new THREE.Mesh(pincaGeometry, CarMaterial)
+        Car2leg3.add(Car2pinca3)
+        Car2pinca3.position.x = 9.5
+        Car2pinca3.position.y = -9
+        Car2pinca3.rotation.z = 0.1 * Math.PI;
+
+
+        const Car2leg4 = new THREE.Mesh(legGeometry, CarMaterial)
+        CarBody2.add(Car2leg4)
+        Car2leg4.position.x = -16
+        Car2leg4.position.y = 5
+        Car2leg4.rotation.z = -0.2;
+        Car2leg4.rotation.x = 0.4;
+
+        const Car2pinca4 = new THREE.Mesh(pincaGeometry, CarMaterial)
+        Car2leg4.add(Car2pinca4)
+        Car2pinca4.position.x = -9.5
+        Car2pinca4.position.y = -9
+        Car2pinca4.rotation.z = -0.1 * Math.PI;
+
+
+        const Car2leg5 = new THREE.Mesh(legGeometry, CarMaterial)
+        CarBody2.add(Car2leg5)
+        Car2leg5.position.x = -13
+        Car2leg5.position.y = 5
+        Car2leg5.position.z = -6
+        Car2leg5.rotation.z = -0.2;
+        Car2leg5.rotation.x = 0.4;
+
+        const Car2pinca5 = new THREE.Mesh(pincaGeometry, CarMaterial)
+        Car2leg5.add(Car2pinca5)
+        Car2pinca5.position.x = -9.5
+        Car2pinca5.position.y = -9
+        Car2pinca5.rotation.z = -0.1 * Math.PI;
+
+        const Car2leg6 = new THREE.Mesh(legGeometry, CarMaterial)
+        CarBody2.add(Car2leg6)
+        Car2leg6.position.x = -13
+        Car2leg6.position.y = 5
+        Car2leg6.position.z = 6
+        Car2leg6.rotation.z = -0.2;
+        Car2leg6.rotation.x = 0.4;
+
+        const Car2pinca6 = new THREE.Mesh(pincaGeometry, CarMaterial)
+        Car2leg6.add(Car2pinca6)
+        Car2pinca6.position.x = -9.5
+        Car2pinca6.position.y = -9
+        Car2pinca6.rotation.z = -0.1 * Math.PI;
+
+
+        objects.push(CarBody1)
+        objects.push(CarBody2)
+
+        /* scene.remove(CarBody1)           Importante
+        scene.remove(CarBody2) */
+
+        function animate() {
+
+            if (down == false) {
+                if (CarBody1.position.y < 12) {
+                    CarBody1.position.y += 0.05
+
+                    Car1leg1.rotation.x -= 0.02
+                    Car1leg1.position.y -= 0.01
+
+                    Car1leg2.rotation.x -= 0.02
+                    Car1leg2.position.y -= 0.01
+
+                    Car1leg3.rotation.x -= 0.02
+                    Car1leg3.position.y -= 0.01
+
+                    Car1leg4.rotation.x -= 0.02
+                    Car1leg4.position.y -= 0.01
+
+                    Car1leg5.rotation.x -= 0.02
+                    Car1leg5.position.y -= 0.01
+
+                    Car1leg6.rotation.x -= 0.02
+                    Car1leg6.position.y -= 0.01
+                } else {
+                    down = true
+                }
+            }
+
+            if (down == true) {
+                if (CarBody1.position.y > 10) {
+                    CarBody1.position.y -= 0.05
+
+                    Car1leg1.rotation.x += 0.02
+                    Car1leg1.position.y += 0.01
+
+                    Car1leg2.rotation.x += 0.02
+                    Car1leg2.position.y += 0.01
+
+                    Car1leg3.rotation.x += 0.02
+                    Car1leg3.position.y += 0.01
+
+                    Car1leg4.rotation.x += 0.02
+                    Car1leg4.position.y += 0.01
+
+                    Car1leg5.rotation.x += 0.02
+                    Car1leg5.position.y += 0.01
+
+                    Car1leg6.rotation.x += 0.02
+                    Car1leg6.position.y += 0.01
+                } else {
+                    down = false
+                }
+            }
+
+            if (down2 == false) {
+                if (CarBody2.position.y < 12) {
+                    CarBody2.position.y += 0.05
+
+                    Car2leg1.rotation.x -= 0.02
+                    Car2leg1.position.y -= 0.01
+
+                    Car2leg2.rotation.x -= 0.02
+                    Car2leg2.position.y -= 0.01
+
+                    Car2leg3.rotation.x -= 0.02
+                    Car2leg3.position.y -= 0.01
+
+                    Car2leg4.rotation.x -= 0.02
+                    Car2leg4.position.y -= 0.01
+
+                    Car2leg5.rotation.x -= 0.02
+                    Car2leg5.position.y -= 0.01
+
+                    Car2leg6.rotation.x -= 0.02
+                    Car2leg6.position.y -= 0.01
+                } else {
+                    down2 = true
+                }
+            }
+
+            if (down2 == true) {
+                if (CarBody2.position.y > 10) {
+                    CarBody2.position.y -= 0.05
+
+                    Car2leg1.rotation.x += 0.02
+                    Car2leg1.position.y += 0.01
+
+                    Car2leg2.rotation.x += 0.02
+                    Car2leg2.position.y += 0.01
+
+                    Car2leg3.rotation.x += 0.02
+                    Car2leg3.position.y += 0.01
+
+                    Car2leg4.rotation.x += 0.02
+                    Car2leg4.position.y += 0.01
+
+                    Car2leg5.rotation.x += 0.02
+                    Car2leg5.position.y += 0.01
+
+                    Car2leg6.rotation.x += 0.02
+                    Car2leg6.position.y += 0.01
+                } else {
+                    down2 = false
+                }
+            }
+
+            CarBody1.position.z += 0.05;
+            CarBody2.position.x -= 0.05;
+
+            /* const intersects = raycaster.intersectObjects( scene.children );
+
+            for ( let i = 0; i < intersects.length; i ++ ) {
+
+                intersects[ i ].object.material.color.set( 0xff0000 );
+
+            } */
+
+
+            // controls.update();
+
+            renderer.render(scene, camera);
+            requestAnimationFrame(animate);
+        }
+
+        function peixe() {
+            const geometry = new THREE.CylinderGeometry(5, 5, 20, 32);
+            const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+            const cylinder = new THREE.Mesh(geometry, material);
+            scene.add(cylinder);
+        }
+        animate();
+
+
+
+
+
+        document.onkeydown = function (e) {
+            if (e.keyCode === 37) {         /* esquerda */
+                camera.position.x -= 5
+            } else if (e.keyCode === 39) {   /* direita */
+                camera.position.x += 5
+            } else if (e.keyCode === 38) {   /* cima */
+                camera.position.z -= 5
+            } else if (e.keyCode === 40) {   /* baixo */
+                camera.position.z += 5
+            }
+        }
+
+        document.addEventListener('mousedown', event => {
+            console.log("mousedown", objects)
+          
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+            let intersects = raycaster.intersectObjects(objects);
+
+            if (intersects.length > 0) {
+                console.log(intersects)
+                let selectedObject = intersects[0].object;
+                let intersectsPlane = raycaster.intersectObject(plane);
+                offset.copy(intersectsPlane[0].point).sub(selectedObject.position);
+            }
+        })
+
+        document.addEventListener('mousemove', event => {
+            console.log("mousemove", objects)
+          
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+            let intersects = raycaster.intersectObjects(objects);
+
+            if (intersects.length > 0) {
+                let selectedObject = intersects[0].object;
+                let intersectsPlane = raycaster.intersectObject(plane);
+                selectedObject.position.copy(intersects[0].point.sub(offset))
+                /* offset.copy(intersectsPlane[0].point).sub(selectedObject.position); */
+                selectedObject.x= mouse.x
+                selectedObject.y= mouse.y
+            }
+        })
+        
+        document.addEventListener('mouseup', event => {
+            console.log("mouseup", objects)
+          
+            selectedObject = null
+            scene.remove(CarBody1)           
+            scene.remove(CarBody2)
+            peixe()
+
+        })
+
+        
+
+    
+
+        /* document.addEventListener('mousedown', e => {
+            let intersects = raycaster.intersectObjects(scene.children);
+            if (intersects.length > 0) {
+                selectedObject = intersects[0].object;
+                select=true
+            }
+        })
+
+        document.addEventListener('mousemove', e => {
+            console.log(e)
+            if(select==true){
+                xMouse = e.offsetX; yMouse = e.offsetY;
+                let intersects = raycaster.intersectObjects(scene.children);
+
+                if (intersects.length > 0) {
+                    selectedObject = intersects[0].object;
+                    selectedObject.x = xMouse
+                    selectedObject.y = yMouse
+
+                }
+            }
+        }) */
+
+    </script>
+</body>
+
+</html>
